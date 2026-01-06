@@ -14,6 +14,7 @@
 <div class="container py-5">
     <h1 class="text-center mb-4">All User Data</h1>
 
+    <a href="/addData" class="btn btn-outline-primary">Add New</a>
     <div class="row justify-content-center">
         <div class="col-md-10">
 
@@ -27,22 +28,32 @@
                         <thead class="table-dark text-center">
                             <tr>
                                 <th>ID</th>
-                                <th>Name</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>age</th>
+                                <th>gender</th>
+                                <th>Phone</th>
                                 <th>Email</th>
-                                <th>City</th>
-                                <th>Age</th>
-                                <th>view</th>
+                                <th>Address</th>
+                                <th>View</th>
+                                <th>Delete</th>
+                                <th>update</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data as $id => $user)
                                 <tr class="text-center">
-                                    <td>{{ $id+1 }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->city }}</td>
+                                    <td>{{ $id }}</td>
+                                    <td>{{ $user->fname }}</td>
+                                    <td>{{ $user->lname }}</td>
                                     <td>{{ $user->age }}</td>
+                                    <td>{{ $user->gender }}</td>
+                                    <td>{{ $user->phone }}</td>
+                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $user->address }}</td>
                                     <td><a href={{ route('view.user',$user->id) }}>view</a></td>
+                                    <td><a href={{ route('view.user',$user->id) }}>Delete</a></td>
+                                    <td><a href={{ route('view.user',$user->id) }}>Update</a></td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -18,10 +18,13 @@ class StudentSeeder extends Seeder
 
         $students->each(function ($student) {
             Student::create([
-                'name'  => $student->name,
-                'email' => $student->email,
+                'fname'  => $student->fname,
+                'lname'  => $student->lname,
                 'age'   => $student->age,
-                'city'  => $student->city,
+                'gender'   => $student->gender,
+                'phone'   => $student->phone,
+                'email' => $student->email,
+                'address'  => $student->address,
             ]);
         });
     }

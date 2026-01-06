@@ -1,20 +1,13 @@
 [
     {
-        "name":"monu kumar sharma",
-        "email":"monu@gmail.com",
-        "age":"25",
-        "city":"surat"
-    },
-    {
-        "name":"sonu kumar sharma",
-        "email":"sonu@gmail.com",
-        "age":"25",
-        "city":"surat"
-    },
-    {
-        "name":"Rakesh kumar sharma",
-        "email":"Rakesh@gmail.com",
-        "age":"22",
-        "city":"Delhi"
+        "fname":"SIta",
+        "lname":"kumari",
+        "age":25,
+        "gender":"male",
+        "phone":"9638315426",
+        "email":"Bihar@gmail.com",
+        "address":"Bihar"
     }
+
+
 ]

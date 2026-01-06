@@ -22,20 +22,31 @@ class UserController extends Controller
         return view('singleuser', ['data' => $user]);
     }
 
-    public function addUser()
+    public function addUser(Request $req)
     {
         $affected = DB::table('students')->insertGetId(
             [
-                'name' => 'sonu Kumar sharma',
-                'email' => 'new@gmail.com',
-                'age' => 20,
-                'city' => 'Upsert Nothing chwjhjkfh check'
+                'fname' => $req->fname,
+                'lname' => $req->lname,
+                'age' => $req->age,
+                'gender' => $req->gender,
+                'phone' => $req->phone,
+                'email' => $req->email,
+                'address' => $req->address
             ]
         );
-        return $affected;   
+        if($affected){
+        return redirect()->route('home')->with('success','User added successfully');
+        } else{
+            echo "data not inserted";
+        }
     }
 
-    // update 
+    // update
+
+    public function userUpdate(string $id){
+
+    }
 
     public function updateUser(){
         $user = DB::table('students')->where("id",5)
@@ -44,6 +55,17 @@ class UserController extends Controller
             echo "Update successfully";
         } else{
             echo  "Update Not successfully";
+        }
+    }
+
+    // delete
+
+    public function userDelete($id){
+        $user = DB::table('students')->where('id',$id)->delete();
+        if($user){
+            echo "Delete successFully";
+        } else{
+            echo "Delete not successFully";
         }
     }
 }
