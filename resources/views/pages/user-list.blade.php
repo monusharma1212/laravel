@@ -1,13 +1,13 @@
 @extends('main')
 
-@section('title','Users List')
+@section('title','FAQ')
 
-@section('content')
-
+@section('form')
 <div class="container py-5">
 
     <div class="card shadow-lg border-0 rounded-4">
 
+        <!-- Card Header -->
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center rounded-top-4">
             <h4 class="mb-0">👥 Users Management</h4>
             <a href="{{ route('users.create') }}" class="btn btn-success btn-sm">+ Create User</a>

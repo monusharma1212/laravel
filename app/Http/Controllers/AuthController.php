@@ -53,6 +53,7 @@ class AuthController extends Controller
             'role'=>$role
         ]);
 
+
         Auth::login($user); // ⭐ login kara diya
 
         return $user->role == 'admin'
@@ -62,33 +63,37 @@ class AuthController extends Controller
 
     // Login Logic
    
+
     public function login(Request $req)
     {
-        // Validation
         $req->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        // Attempt login (DB se match karega)
         if (Auth::attempt([
             'email' => $req->email,
             'password' => $req->password
         ])) {
 
-        // Session regenerate (security)
-        $req->session()->regenerate();
+            $req->session()->regenerate();
 
-        // Role based redirect
-        if (Auth::user()->role == 'admin') {
-            return redirect('/users');   // admin dashboard
-        } else {
-            return redirect('/'); // normal user page
+            if (Auth::user()->role == 'admin') {
+                return redirect()->route('dashboard');
+            } else {
+                return redirect()->route('dashboard');
+            }
         }
-    }
 
-    return back()->with('error', 'Invalid Email or Password');
-}
+        // ❌ If login fails
+        return back()->withErrors([
+            'email' => 'Invalid email or password'
+        ])->withInput();
+    
+
+
+        return back()->with('error', 'Invalid Email or Password');
+    }
 
     public function logout(Request $request)
     {

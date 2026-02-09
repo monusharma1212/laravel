@@ -22,7 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role'); // 👈 rollback ke time column remove hoga
+            $table->string('role')->default('user'); // user ya admin
         });
+
     }
 };

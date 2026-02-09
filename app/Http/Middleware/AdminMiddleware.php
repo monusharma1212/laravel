@@ -11,16 +11,15 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Agar login hi nahi hai
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect()->route('login');
         }
 
-        // Agar role admin nahi hai
         if (Auth::user()->role !== 'admin') {
             abort(403, 'Access Denied - Admin Only');
         }
 
         return $next($request);
     }
+
 }
