@@ -1,14 +1,14 @@
 @extends('main')
+
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
             <div class="card shadow-lg border-0 rounded-4">
-
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">✏️ Edit User</h4>
-                    <a href="{{ route('users.index') }}" class="btn btn-light btn-sm">Back</a>
+                    <a href="{{ route('dashboard') }}" class="btn btn-light btn-sm">Back</a>
                 </div>
 
                 <div class="card-body p-4">
@@ -48,10 +48,21 @@
                                        value="{{ old('experience',$user->experience) }}">
                             </div>
 
+                            {{-- Department --}}
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Department</label>
-                                <input type="text" name="department" class="form-control"
-                                       value="{{ old('department',$user->department) }}">
+                                @php
+                                    $selectedDepartments = old('department',
+                                        is_array($user->department)
+                                            ? $user->department
+                                            : (json_decode($user->department, true) ?? [$user->department])
+                                    );
+                                @endphp
+                                <select name="department[]" multiple class="form-select">
+                                    <option value="Engineering" {{ in_array('Engineering',$selectedDepartments)?'selected':'' }}>Engineering</option>
+                                    <option value="Design" {{ in_array('Design',$selectedDepartments)?'selected':'' }}>Design</option>
+                                    <option value="Marketing" {{ in_array('Marketing',$selectedDepartments)?'selected':'' }}>Marketing</option>
+                                </select>
                             </div>
 
                             <div class="col-md-6">
@@ -84,31 +95,33 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Role</label>
-                                <select name="role" class="form-select">
-                                    <option value="user" {{ $user->role=='user'?'selected':'' }}>User</option>
-                                    <option value="admin" {{ $user->role=='admin'?'selected':'' }}>Admin</option>
-                                </select>
-                            </div>
-
+                            {{-- Images --}}
                             <div class="col-md-6">
                                 <label class="form-label">Upload Images</label>
                                 <input type="file" name="images[]" class="form-control" multiple accept="image/*">
-                                @if($user->images)
-                                    <div class="mt-2">
-                                        @foreach($user->images as $img)
-                                            <div style="display:inline-block; margin:5px; text-align:center;">
-                                                <img src="{{ asset('storage/'.$img) }}"
-                                                    width="70" height="70"
-                                                    style="object-fit:cover; border-radius:6px;"><br>
 
-                                                <input type="checkbox" name="delete_images[]" value="{{ $img }}">
-                                                <small class="text-danger">Delete</small>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
+                                @php
+                                $images = [];
+
+                                if (!empty($user->images)) {
+                                    $images = is_array($user->images)
+                                        ? $user->images
+                                        : (json_decode($user->images, true) ?? [$user->images]);
+                                }
+                            @endphp
+
+                            @if(count($images))
+                                <div class="mt-2">
+                                    @foreach($images as $img)
+                                        <div style="display:inline-block; margin:5px; text-align:center;">
+                                            <img src="{{ asset('storage/'.$img) }}" width="70" height="70"
+                                                style="object-fit:cover; border-radius:6px;"><br>
+                                            <input type="checkbox" name="delete_images[]" value="{{ $img }}">
+                                            <small class="text-danger">Delete</small>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                             </div>
 
                             <div class="col-12">

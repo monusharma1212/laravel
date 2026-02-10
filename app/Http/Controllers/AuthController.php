@@ -22,48 +22,54 @@ class AuthController extends Controller
     }
 
     // Register Logic
-    public function register(Request $req)
+    public function register(Request $request)
     {
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email',
+            'password'    => 'required|min:6',
+        
+            'birth_date'  => 'required',   // no strict date rule
+            'experience'  => 'required|numeric',
+            'department'   => 'required|array',
+            'department.*' => 'in:Engineering,Design,Marketing',
 
-        $req->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:20480',
-            'experience' => 'nullable|min:0|max:120',
+        
+            'images'      => 'required',
+            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:20280',
+        
+            'color'       => 'required|string',
+            'skill_level' => 'required|numeric',
+        
+            'shift'       => 'required|in:day,night',
+            'bio'         => 'required|string',
         ]);
     
-        $role = User::count() == 0 ? 'admin' : 'user';
-    
+        // Image Upload
         $imagePaths = [];
-    
-        if ($req->hasFile('images')) {
-            foreach ($req->file('images') as $img) {
-                $imagePaths[] = $img->store('users', 'public');
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $img) {
+                $imagePaths[] = $img->store('users','public');
             }
         }
     
+        // Store user
         $user = User::create([
-            'name' => $req->name,
-            'email' => $req->email,
-            'password' => Hash::make($req->password),
-            'dob' => $req->birth_date,
-            'experience' => $req->experience,
-            'department' => $req->department,
-            'images' => $imagePaths,  // 👈 multiple files
-            'theme_color' => $req->color,
-            'skill_level' => $req->skill_level,
-            'shift' => $req->shift,
-            'newsletter' => $req->newsletter ?? 0,
-            'bio' => $req->bio,
-            'role' => $role
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'dob'         => $request->birth_date,
+            'experience'  => $request->experience,
+            'department' => json_encode($request->department),
+            'images'      => json_encode($imagePaths),
+            'theme_color' => $request->color,
+            'skill_level' => $request->skill_level,
+            'shift'       => $request->shift,
+            'newsletter'  => $request->newsletter ?? 0,
+            'bio'         => $request->bio,
         ]);
-    
         Auth::login($user);
-    
-        return $user->role == 'admin'
-            ? redirect('/dashboard')
-            : redirect('/dashboard');
+        return redirect()->route('dashboard')->with('success','Registration Successful!');
     }
     
 

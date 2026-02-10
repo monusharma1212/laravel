@@ -11,6 +11,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
 {
+    // ❗ IMPORTANT — ADMIN KO DB LEVEL PE HATAO
     $query = User::where('role', '!=', 'admin');
 
     // Search
@@ -23,22 +24,15 @@ class UserController extends Controller
 
     // Department filter
     if ($request->department) {
-        $query->where('department', $request->department);
+        $query->whereJsonContains('department', $request->department);
     }
 
-    // Sorting
-    $sort = $request->get('sort', 'id');       // default column
-    $direction = $request->get('direction', 'asc'); // asc or desc
+    $users = $query->latest()->paginate(5)->withQueryString();
 
-    $allowed = ['name','email','department','experience','skill_level','dob'];
-    if (!in_array($sort, $allowed)) {
-        $sort = 'id';
-    }
-
-    $users = $query->orderBy($sort, $direction)->paginate(5)->withQueryString();
-
-    return view('admin.users', compact('users'));
+    return view('dashboard', compact('users'));
 }
+
+        
 
     
     public function create()
@@ -49,38 +43,67 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240'
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:users,email',
+            'password'    => 'required|string|min:6',
+            'dob'         => 'required|date',
+            'experience'  => 'required|integer|min:0|max:50',
+            'department'   => 'required|array',
+            'department.*' => 'in:Engineering,Design,Marketing',
+            'skill_level' => 'required|integer|min:1|max:10',
+            'shift'       => 'required|in:day,night',
+            'theme_color' => 'required|string',
+            'bio'         => 'required|string|max:1000',
+            'role'        => 'nullable|in:user,admin',
+            'images'      => 'nullable|array',
+            'images.*'    => 'image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
     
-        $imagePaths = [];
-    
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $img) {
-                $imagePaths[] = $img->store('users', 'public');
+            $imagePaths = [];
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $file) {
+            
+                    // original file name
+                    $filename = $file->getClientOriginalName();
+            
+                    // agar same naam already exist kare to rename na ho isliye unique suffix
+                    $path = 'users/'.$filename;
+                    $counter = 1;
+            
+                    while (Storage::disk('public')->exists($path)) {
+                        $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+                                    .'_'.$counter.'.'
+                                    .$file->getClientOriginalExtension();
+            
+                        $path = 'users/'.$filename;
+                        $counter++;
+                    }
+            
+                    $file->storeAs('users', $filename, 'public');
+                    $imagePaths[] = $path;
+                }
             }
-        }
-    
+
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'experience' => $request->experience,
+            'name'        => $request->name,
+            'email'       => $request->email,
+            'password'    => Hash::make($request->password),
+            'experience'  => $request->experience,
             'department' => $request->department,
             'skill_level' => $request->skill_level,
-            'shift' => $request->shift,
+            'shift'       => $request->shift,
             'theme_color' => $request->theme_color,
-            'bio' => $request->bio,
-            'dob' => $request->dob,
-            'newsletter' => $request->has('newsletter'),
-            'role' => $request->role ?? 'user',
-            'images' => $imagePaths,
+            'bio'         => $request->bio,
+            'dob'         => $request->dob,
+            'newsletter'  => $request->has('newsletter'),
+            'role'        => $request->role ?? 'user',
+            'images'      => $imagePaths,
         ]);
-        
-        return redirect()->route('users.index')->with('success','User Created');
+    
+        return redirect()->route('dashboard')->with('success','User Created');
     }
+    
     
     
     
@@ -89,33 +112,63 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         return view('admin.edit-user', compact('user'));
     }
-
     public function update(Request $req, $id)
     {
         $user = User::findOrFail($id);
-        
+    
         $req->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
-            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:20280'
+            'experience' => 'required|integer|min:0|max:50',
+            'department' => 'required|array',
+            'skill_level' => 'required|integer|min:1|max:10',
+            'shift' => 'required|in:day,night',
+            'theme_color' => 'required|string',
+            'bio' => 'required|string|max:1000',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240'
         ]);
-        
-        $existingImages = $user->images ?? [];
-        
-        // Delete selected
+    
+        // ✅ STEP 1 — Purani images load karo
+        $existingImages = [];
+        if (!empty($user->images)) {
+            $existingImages = is_array($user->images)
+                ? $user->images
+                : (json_decode($user->images, true) ?? []);
+        }
+    
+        // ✅ STEP 2 — Sirf selected images delete karo
         if ($req->delete_images) {
             foreach ($req->delete_images as $img) {
                 Storage::disk('public')->delete($img);
                 $existingImages = array_diff($existingImages, [$img]);
             }
         }
-        
-        // Add new
+    
+        // ✅ STEP 3 — New images add karo (old ke saath merge)
         if ($req->hasFile('images')) {
             foreach ($req->file('images') as $file) {
-                $existingImages[] = $file->store('users', 'public');
+    
+                $filename = $file->getClientOriginalName();
+                $path = 'users/'.$filename;
+                $counter = 1;
+    
+                while (Storage::disk('public')->exists($path)) {
+                    $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+                                .'_'.$counter.'.'
+                                .$file->getClientOriginalExtension();
+    
+                    $path = 'users/'.$filename;
+                    $counter++;
+                }
+    
+                $file->storeAs('users', $filename, 'public');
+    
+                // 🔥 merge karo, replace nahi
+                $existingImages[] = $path;
             }
         }
-        
+    
+        // ✅ STEP 4 — Save everything
         $user->update([
             'name' => $req->name,
             'email' => $req->email,
@@ -127,26 +180,64 @@ class UserController extends Controller
             'bio' => $req->bio,
             'newsletter' => $req->has('newsletter'),
             'dob' => $req->dob,
-            'role' => $req->role,
-            'images' => array_values($existingImages),
+            'images' => array_values($existingImages), // 🧠 old + new both
             'password' => $req->password ? Hash::make($req->password) : $user->password,
         ]);
-        
+    
         return redirect()->route('users.index')->with('success','User Updated');
     }
+    
+    
+    
     
 
 
     public function destroy($id)
     {
-        User::findOrFail($id)->delete();
-        return back()->with('success','User Deleted');
-        dd(auth()->user());
+        $user = User::findOrFail($id);
+
+        // 🧠 Ensure images always array
+        $images = [];
+
+        if (!empty($user->images)) {
+            $images = is_array($user->images)
+                ? $user->images
+                : (json_decode($user->images, true) ?? []);
+        }
+
+        // 🗑 Delete files
+        foreach ($images as $img) {
+            if (Storage::disk('public')->exists($img)) {
+                Storage::disk('public')->delete($img);
+            }
+        }
+
+        $user->delete();
+
+        return redirect()->route('dashboard')->with('success', 'User deleted successfully');
     }
+
+
 
     public function profile()
     {
-        $data = Auth::user();   // Direct database se ek hi user
-        return view('users.index', compact('data'));
+        $data = Auth::user();
+
+        $users = $data->role === 'admin'
+            ? \App\Models\User::where('role','!=','admin')->latest()->paginate(10)
+            : collect();
+
+        return view('users.index', compact('data','users'));
     }
+
+    public function profilEdit()
+    {
+        $data = auth()->user();   // 👈 single user object
+        return view('users.profile-edit', compact('data'));
+    }
+
+    public function profileUpdate(){
+        
+    }
+
 }

@@ -32,38 +32,10 @@
             <a class="navbar-brand fw-bold text-white d-block mb-4" href="{{ url('/') }}">MyBrand</a>
 
             <ul class="nav flex-column">
-
                 <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('home') ? 'active fw-bold text-warning' : '' }}" href="{{ route('home') }}">Home</a>
+                    <a href="{{ route('profile') }}"class="btn btn-primary btn-sm w-100 mb-2">My Profile</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('about') ? 'active fw-bold text-warning' : '' }}" href="{{ route('about') }}">About</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('contact') ? 'active fw-bold text-warning' : '' }}" href="{{ route('contact') }}">Contact</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('product') ? 'active fw-bold text-warning' : '' }}" href="{{ route('product') }}">Product</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('location') ? 'active fw-bold text-warning' : '' }}" href="{{ route('location') }}">Location</a>
-                </li>
-
-                @auth
-                    @if(auth()->user()->role === 'admin')
-                        <li class="nav-item">
-                            <a class="nav-link text-warning fw-bold" href="{{ route('users.index') }}">
-                                Users List
-                            </a>
-                        </li>
-                    @endif
-                @endauth
-
-            </ul>
+            </ul>   
 
             <hr class="bg-light">
 

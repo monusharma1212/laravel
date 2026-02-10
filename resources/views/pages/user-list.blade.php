@@ -2,7 +2,7 @@
 
 @section('title','FAQ')
 
-@section('form')
+@section('content')
 <div class="container py-5">
 
     <div class="card shadow-lg border-0 rounded-4">

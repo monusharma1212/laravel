@@ -10,7 +10,6 @@
         <p class="lead text-muted mb-4">
             We build modern, secure and scalable web applications to help businesses grow digitally.
         </p>
-        <a href="{{ route('about') }}" class="btn btn-dark btn-lg">Learn More</a>
     </div>
 
     <hr class="my-5">
@@ -49,7 +48,6 @@
                 We are a passionate team of developers creating high-quality digital products.
                 Our goal is to deliver user-friendly, secure, and scalable applications.
             </p>
-            <a href="{{ route('about') }}" class="btn btn-outline-dark">Read More</a>
         </div>
 
         <div class="col-md-6 text-center">
@@ -63,7 +61,6 @@
     <!-- 🔹 CALL TO ACTION -->
     <div class="text-center py-5 bg-dark text-white rounded">
         <h3 class="mb-3">Ready to start your project?</h3>
-        <a href="{{ route('contact') }}" class="btn btn-light btn-lg">Contact Us</a>
     </div>
 
 @endsection

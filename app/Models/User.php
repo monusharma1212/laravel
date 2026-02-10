@@ -3,15 +3,16 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,HasApiTokens;
+    use HasApiTokens,HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +36,7 @@ class User extends Authenticatable
             ];
             protected $casts = [
                 'images' => 'array',
+                'department' => 'array',
             ];
         /**
      * The attributes that should be hidden for serialization.
@@ -46,6 +48,25 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+    
+            if (!empty($user->images)) {
+    
+                $images = is_array($user->images)
+                    ? $user->images
+                    : (json_decode($user->images, true) ?? []);
+    
+                foreach ($images as $img) {
+                    if (Storage::disk('public')->exists($img)) {
+                        Storage::disk('public')->delete($img);
+                    }
+                }
+            }
+        });
+    }
+    
     /**
      * Get the attributes that should be cast.
      *
