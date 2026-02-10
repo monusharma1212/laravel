@@ -92,13 +92,22 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold">Resume</label>
-                                <input type="file" name="resume" class="form-control">
-                                @if($user->resume)
-                                    <small>Current: 
-                                        <a href="{{ asset('storage/'.$user->resume) }}" target="_blank">View</a>
-                                    </small>
+                            <div class="col-md-6">
+                                <label class="form-label">Upload Images</label>
+                                <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                                @if($user->images)
+                                    <div class="mt-2">
+                                        @foreach($user->images as $img)
+                                            <div style="display:inline-block; margin:5px; text-align:center;">
+                                                <img src="{{ asset('storage/'.$img) }}"
+                                                    width="70" height="70"
+                                                    style="object-fit:cover; border-radius:6px;"><br>
+
+                                                <input type="checkbox" name="delete_images[]" value="{{ $img }}">
+                                                <small class="text-danger">Delete</small>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </div>
 

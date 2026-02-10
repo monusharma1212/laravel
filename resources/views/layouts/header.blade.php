@@ -1,26 +1,58 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-    <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ url('/') }}">MyBrand</a>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto">
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    #side {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 16.666667%; /* col-md-2 width */
+        height: 100vh;
+        background: #212529;
+        overflow: hidden;
+        z-index: 1000;
+    }
+    .content-area {
+        margin-left: 16.666667%;
+        height: 100vh;
+        overflow-y: auto;
+    }
+</style>
+
+
+<div class="container-fluid">
+    <div class="row">
+
+        {{-- SIDEBAR --}}
+        <div class="col-md-2 text-white p-3" id="side">
+
+            <a class="navbar-brand fw-bold text-white d-block mb-4" href="{{ url('/') }}">MyBrand</a>
+
+            <ul class="nav flex-column">
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
+                    <a class="nav-link text-white {{ request()->routeIs('home') ? 'active fw-bold text-warning' : '' }}" href="{{ route('home') }}">Home</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('about') ? 'active' : '' }}" href="{{ route('about') }}">About</a>
+                    <a class="nav-link text-white {{ request()->routeIs('about') ? 'active fw-bold text-warning' : '' }}" href="{{ route('about') }}">About</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('contact') ? 'active' : '' }}" href="{{ route('contact') }}">Contact</a>
-                    
+                    <a class="nav-link text-white {{ request()->routeIs('contact') ? 'active fw-bold text-warning' : '' }}" href="{{ route('contact') }}">Contact</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('product') ? 'active' : '' }}" href="{{ route('product') }}">Product</a>
+                    <a class="nav-link text-white {{ request()->routeIs('product') ? 'active fw-bold text-warning' : '' }}" href="{{ route('product') }}">Product</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('location') ? 'active' : '' }}" href="{{ route('location') }}">Location</a>
+                    <a class="nav-link text-white {{ request()->routeIs('location') ? 'active fw-bold text-warning' : '' }}" href="{{ route('location') }}">Location</a>
                 </li>
-                   {{-- Admin Special Menu --}}
+
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <li class="nav-item">
@@ -30,34 +62,31 @@
                         </li>
                     @endif
                 @endauth
+
             </ul>
 
-            <div class="d-flex gap-2">
+            <hr class="bg-light">
 
+            <div class="mt-3">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm">
-                        Dashboard
-                    </a>
-            
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm w-100 mb-2">Dashboard</a>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button class="btn btn-outline-light btn-sm">Logout</button>
+                        <button class="btn btn-outline-light btn-sm w-100">Logout</button>
                     </form>
                 @endauth
-            
-            
+
                 @guest
-                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
-                        Login
-                    </a>
-            
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm">
-                        Register
-                    </a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm w-100 mb-2">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm w-100">Register</a>
                 @endguest
-            
             </div>
-            
         </div>
+
+        {{-- MAIN CONTENT --}}
+        <div class="col-md-10 p-4 content-area">
+            @yield('content')
+        </div>
+
     </div>
-</nav>
+</div>

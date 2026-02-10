@@ -4,8 +4,37 @@
 
 @section('content')
 
+
+@php
+    $dir = request('direction') == 'asc' ? 'desc' : 'asc';
+@endphp
+
 <div class="container py-5">
 
+
+
+    <form method="GET" action="{{ route('users.index') }}" class="row mb-3">
+
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Search name or email"
+                   value="{{ request('search') }}">
+        </div>
+    
+        <div class="col-md-3">
+            <select name="department" class="form-select">
+                <option value="">All Departments</option>
+                <option value="Design" {{ request('department')=='Design'?'selected':'' }}>Design</option>
+                <option value="Marketing" {{ request('department')=='Marketing'?'selected':'' }}>Marketing</option>
+                <option value="Engineering" {{ request('department')=='Engineering'?'selected':'' }}>Engineering</option>
+            </select>
+        </div>
+    
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Filter</button>
+        </div>
+    
+    </form>
+    
     <div class="card shadow-lg border-0 rounded-4">
 
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center rounded-top-4">
@@ -20,16 +49,31 @@
                     
                     <thead class="table-dark">
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
+                            
+                            <th style="width: 180px;">
+                                <a class="text-decoration-none text-white" ref="{{ route('users.index', ['sort'=>'name','direction'=>$dir] + request()->query()) }}">
+                                    Name
+                                </a>
+                            </th>
+                            
+                            <th>
+                                <a class="text-decoration-none text-white" href="{{ route('users.index', ['sort'=>'email','direction'=>$dir] + request()->query()) }}">
+                                    Email
+                                </a>
+                            </th>
+                            
                             <th>Department</th>
-                            <th>Experience</th>
+                            <th>
+                                <a class="text-decoration-none text-white" href="{{ route('users.index', ['sort'=>'experience','direction'=>$dir] + request()->query()) }}">
+                                    Experience
+                                </a>
+                            </th>
                             <th>Skill</th>
                             <th>Shift</th>
                             <th>DOB</th>
                             <th>Theme</th>
                             <th>Role</th>
-                            <th>Resume</th>
+                            <th>Images</th>
                             <th width="160">Action</th>
                         </tr>
                     </thead>
@@ -58,11 +102,15 @@
                             </td>
 
                             <td>
-                                @if ($data->resume)
-                                    <a href="{{ asset('storage/' . $data->resume) }}" target="_blank"
-                                       class="btn btn-sm btn-outline-info">View</a>
+                                @if ($data->images)
+                                    @foreach ($data->images as $img)
+                                        <img src="{{ asset('storage/' . $img) }}"
+                                             width="50"
+                                             height="50"
+                                             style="object-fit:cover; border-radius:6px; margin:2px;">
+                                    @endforeach
                                 @else
-                                    <span class="text-muted">No File</span>
+                                    <span class="text-muted">No Image</span>
                                 @endif
                             </td>
 
@@ -85,6 +133,10 @@
                     </tbody>
 
                 </table>
+
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $users->links('pagination::bootstrap-5') }}
+                </div>
             </div>
 
         </div>

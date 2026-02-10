@@ -1,29 +1,63 @@
+@extends('main')
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@section('title', 'Join Us - Create Account')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    @yield('css')
-</head>
-<body>
+@section('title','Dashboard')
 
-    @include('layouts.header')
-    <h1>This is the Dashboard</h1>
-    Welcome {{ auth()->user()->name }}
+@section('content')
 
-    <main class="container my-5">
-        @yield('content')
-    </main>
+<div class="container">
 
-    @include('layouts.footer')  
+    <!-- 🔹 Welcome Section -->
+    <div class="mb-4 text-center">
+        <h2 class="fw-bold">Welcome, {{ auth()->user()->name }} 👋</h2>
+        <p class="text-muted">Here’s an overview of your account and system activity.</p>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/script.js') }}"></script>
-    {{-- @yield('script') --}}
-</body>
-</html>
+    <!-- 🔹 Stats Cards -->
+    <div class="row g-4">
 
+        @auth
+            @if(auth()->user()->role === 'admin')
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0 text-center p-4">
+                    <h5 class="text-muted">Total Users</h5>
+                    <h2 class="fw-bold text-primary">{{ \App\Models\User::count() }}</h2>
+                </div>
+            </div>
+            @endif
+        @endauth
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <h5 class="text-muted">Your Role</h5>
+                <h2 class="fw-bold text-success">{{ ucfirst(auth()->user()->role) }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 text-center p-4">
+                <h5 class="text-muted">Account Created</h5>
+                <h2 class="fw-bold text-dark">{{ auth()->user()->created_at->format('d M Y') }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-5">
+
+    <!-- 🔹 Quick Actions -->
+    <div class="text-center">
+        <h4 class="mb-3">Quick Actions</h4>
+
+        <a href="{{ route('profile', auth()->user()->id) }}" class="btn btn-outline-dark m-2">
+            My Profile
+        </a>
+        @if(auth()->user()->role === 'admin')
+            <a href="{{ route('users.index') }}" class="btn btn-dark m-2">Manage Users</a>
+        @endif
+
+        <a href="{{ route('contact') }}" class="btn btn-outline-secondary m-2">Support</a>
+    </div>
+
+</div>
+
+@endsection

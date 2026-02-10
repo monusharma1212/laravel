@@ -62,13 +62,8 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Resume (PDF)</label>
-                                <input type="file" name="resume" class="form-control" accept=".pdf">
-                                @if(isset($user) && $user->resume)
-                                    <small class="text-muted">Current:
-                                        <a href="{{ asset('storage/'.$user->resume) }}" target="_blank">View</a>
-                                    </small>
-                                @endif
+                                <label class="form-label">Upload Images</label>
+                                <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
                             </div>
 
                             <div class="col-md-6">

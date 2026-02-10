@@ -22,9 +22,14 @@ Route::middleware('auth')->group(function(){
 
     Route::get('/dashboard',[HomeController::class,'dashboard'])->name('dashboard');
 
-    // USER PROFILE
+    // USER PROFILE 
     Route::get('/profile',[UserController::class,'profile'])->name('profile');
     Route::put('/profile/update',[UserController::class,'updateProfile'])->name('profile.update');
+    // see profile 
+    Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
+    
+
+    // pages
     Route::view('/contact', 'pages.contact')->name('contact');
     Route::view('/home', 'pages.home')->name('home');
     Route::view('/location', 'pages.location')->name('location');

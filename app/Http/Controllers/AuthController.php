@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+
+    
     // Login Page
     public function showLogin() {
         return view('auth.login');
@@ -20,46 +22,50 @@ class AuthController extends Controller
     }
 
     // Register Logic
-    public function register(Request $req) {
+    public function register(Request $req)
+    {
 
         $req->validate([
-            'name'=>'required',
-            'email'=>'required|email|unique:users',
-            'password'=>'required|min:6',
-            'resume'=>'nullable|mimes:pdf|max:2048',
-            'experience'=>'nullable|min:0|max:120',
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:20480',
+            'experience' => 'nullable|min:0|max:120',
         ]);
-
-        // 👇 First user admin banega
+    
         $role = User::count() == 0 ? 'admin' : 'user';
-
-        if($req->hasFile('resume')){
-            $resumePath = $req->file('resume')->store('resumes','public');
+    
+        $imagePaths = [];
+    
+        if ($req->hasFile('images')) {
+            foreach ($req->file('images') as $img) {
+                $imagePaths[] = $img->store('users', 'public');
+            }
         }
-
+    
         $user = User::create([
-            'name'=>$req->name,
-            'email'=>$req->email,
-            'password'=>Hash::make($req->password),
-            'dob'=>$req->birth_date,
-            'experience'=>$req->experience,
-            'department'=>$req->department,
-            'resume'=>$resumePath,  
-            'theme_color'=>$req->color,
-            'skill_level'=>$req->skill_level,
-            'shift'=>$req->shift,
-            'newsletter'=>$req->newsletter ?? 0,
-            'bio'=>$req->bio,
-            'role'=>$role
+            'name' => $req->name,
+            'email' => $req->email,
+            'password' => Hash::make($req->password),
+            'dob' => $req->birth_date,
+            'experience' => $req->experience,
+            'department' => $req->department,
+            'images' => $imagePaths,  // 👈 multiple files
+            'theme_color' => $req->color,
+            'skill_level' => $req->skill_level,
+            'shift' => $req->shift,
+            'newsletter' => $req->newsletter ?? 0,
+            'bio' => $req->bio,
+            'role' => $role
         ]);
-
-
-        Auth::login($user); // ⭐ login kara diya
-
+    
+        Auth::login($user);
+    
         return $user->role == 'admin'
-        ? redirect('/users')
-        : redirect('/dashboard');
+            ? redirect('/dashboard')
+            : redirect('/dashboard');
     }
+    
 
     // Login Logic
    

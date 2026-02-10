@@ -1,3 +1,13 @@
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 @extends('main')
 
 @section('content')
@@ -9,7 +19,7 @@
             <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
-                <div class="row g-3">
+                <div class="row g-3">   
 
                     <div class="col-md-6">
                         <label class="form-label">Full Name</label>
@@ -47,8 +57,8 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Upload Resume (PDF)</label>
-                        <input type="file" name="resume" class="form-control" accept=".pdf">
+                        <label class="form-label">Upload Images</label>
+                        <input type="file" name="images[]" class="form-control" accept="image/*" multiple>
                     </div>
 
                     <div class="col-md-6">
