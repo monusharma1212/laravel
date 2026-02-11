@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 
 //-- Public --//
@@ -17,10 +17,10 @@ Route::post('/register',[AuthController::class,'register'])->name('register');
 //-- Authenticated users --//
 
 Route::middleware('auth')->group(function(){
-    Route::get('/dashboard',[HomeController::class,'dashboard'])->name('dashboard');
-    Route::get('/profile',[UserController::class,'profile'])->name('profile');
-    Route::get('/profilEdit',[UserController::class,'profilEdit'])->name('profilEdit');
-    Route::put('/profileUpdate',[UserController::class,'profileUpdate'])->name('profileUpdate');
+    Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
+    Route::get('/profile',[ProfileController::class,'profile'])->name('profile');
+    Route::get('/profilEdit',[ProfileController::class,'profilEdit'])->name('profilEdit');
+    Route::put('/profileUpdate',[ProfileController::class,'profileUpdate'])->name('profileUpdate');
 
 });
 

@@ -35,9 +35,9 @@ class UserController extends Controller
     return view('dashboard', compact('users'));
 }
 
-        
 
-    
+
+
     public function create()
     {
         return view('admin.create-user');
@@ -61,28 +61,28 @@ class UserController extends Controller
             'images'      => 'nullable|array',
             'images.*'    => 'image|mimes:jpg,jpeg,png,webp|max:10240',
         ]);
-    
+
             $imagePaths = [];
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $file) {
-            
+
                     // original file name
                     $filename = $file->getClientOriginalName();
-            
+
                     // agar same naam already exist kare to rename na ho isliye unique suffix
                     $path = 'users/'.$filename;
                     $counter = 1;
-            
+
                     while (Storage::disk('public')->exists($path)) {
                         $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
                                     .'_'.$counter.'.'
                                     .$file->getClientOriginalExtension();
-            
+
                         $path = 'users/'.$filename;
                         $counter++;
                     }
-            
+
                     $file->storeAs('users', $filename, 'public');
                     $imagePaths[] = $path;
                 }
@@ -103,13 +103,13 @@ class UserController extends Controller
             'role'        => $request->role ?? 'user',
             'images'      => $imagePaths,
         ]);
-    
+
         return redirect()->route('dashboard')->with('success','User Created');
     }
-    
-    
-    
-    
+
+
+
+
     public function edit($id)
     {
         $user = User::findOrFail($id);
@@ -118,7 +118,7 @@ class UserController extends Controller
     public function update(Request $req, $id)
     {
         $user = User::findOrFail($id);
-    
+
         $req->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
@@ -130,7 +130,7 @@ class UserController extends Controller
             'bio' => 'required|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240'
         ]);
-    
+
         // ✅ STEP 1 — Purani images load karo
         $existingImages = [];
         if (!empty($user->images)) {
@@ -138,7 +138,7 @@ class UserController extends Controller
                 ? $user->images
                 : (json_decode($user->images, true) ?? []);
         }
-    
+
         // ✅ STEP 2 — Sirf selected images delete karo
         if ($req->delete_images) {
             foreach ($req->delete_images as $img) {
@@ -146,31 +146,31 @@ class UserController extends Controller
                 $existingImages = array_diff($existingImages, [$img]);
             }
         }
-    
+
         // ✅ STEP 3 — New images add karo (old ke saath merge)
         if ($req->hasFile('images')) {
             foreach ($req->file('images') as $file) {
-    
+
                 $filename = $file->getClientOriginalName();
                 $path = 'users/'.$filename;
                 $counter = 1;
-    
+
                 while (Storage::disk('public')->exists($path)) {
                     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
                                 .'_'.$counter.'.'
                                 .$file->getClientOriginalExtension();
-    
+
                     $path = 'users/'.$filename;
                     $counter++;
                 }
-    
+
                 $file->storeAs('users', $filename, 'public');
-    
+
                 // 🔥 merge karo, replace nahi
                 $existingImages[] = $path;
             }
         }
-    
+
         // ✅ STEP 4 — Save everything
         $user->update([
             'name' => $req->name,
@@ -186,13 +186,13 @@ class UserController extends Controller
             'images' => array_values($existingImages), // 🧠 old + new both
             'password' => $req->password ? Hash::make($req->password) : $user->password,
         ]);
-    
+
         return redirect()->route('users.index')->with('success','User Updated');
     }
-    
-    
-    
-    
+
+
+
+
 
 public function destroy($id)
 {
@@ -216,94 +216,6 @@ public function destroy($id)
 }
 
 
-
-    public function profile()
-    {
-        $data = Auth::user();
-
-        $users = $data->role === 'admin'
-            ? \App\Models\User::where('role','!=','admin')->latest()->paginate(10)
-            : collect();
-
-        return view('users.index', compact('data','users'));
-    }
-
-    public function profilEdit()
-    {
-        $data = auth()->user();   // 👈 single user object
-        return view('users.profile-edit', compact('data'));
-    }
-
-
-
-
-    public function profileUpdate(Request $request)
-    {
-        $user = Auth::user();
-    
-        // ✅ VALIDATION
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => ['required','email', Rule::unique('users')->ignore($user->id)],
-            'experience'  => 'required|integer|min:0|max:50',
-    
-            'department'      => 'required|array|min:1',
-            'department.*'    => 'string',
-    
-            'skill_level' => 'required|integer|min:1|max:10',
-            'shift'       => 'required|in:day,night',
-            'theme_color' => 'required|string',
-            'bio'         => 'nullable|string|max:500',
-    
-            'password' => 'nullable|min:6|confirmed',
-    
-            'images'   => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
-    
-            'delete_images'   => 'nullable|array',
-            'delete_images.*' => 'string',
-        ]);
-    
-        // 🧠 Load existing images
-        $existingImages = is_array($user->images)
-            ? $user->images
-            : (json_decode($user->images, true) ?? []);
-    
-        // ❌ Delete selected images
-        if ($request->delete_images) {
-            foreach ($request->delete_images as $img) {
-                if (in_array($img, $existingImages)) {
-                    Storage::disk('public')->delete($img);
-                    $existingImages = array_diff($existingImages, [$img]);
-                }
-            }
-        }
-    
-        // ➕ Add new images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-                $path = $file->store('users', 'public');
-                $existingImages[] = $path;
-            }
-        }
-    
-        // 🔑 Update user
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'experience' => $request->experience,
-            'department' => json_encode($request->department),
-            'skill_level' => $request->skill_level,
-            'shift' => $request->shift,
-            'theme_color' => $request->theme_color,
-            'bio' => $request->bio,
-            'images' => array_values($existingImages),
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-        ]);
-    
-        return redirect()->route('profile')->with('success','Profile updated successfully');
-    }
-    
 
 
 }

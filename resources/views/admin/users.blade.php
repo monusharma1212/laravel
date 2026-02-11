@@ -11,8 +11,10 @@
             <select name="department" class="form-select">
                 <option value="">All Departments</option>
                 <option value="Design" {{ request('department') == 'Design' ? 'selected' : '' }}>Design</option>
-                <option value="Marketing" {{ request('department') == 'Marketing' ? 'selected' : '' }}>Marketing</option>
-                <option value="Engineering" {{ request('department') == 'Engineering' ? 'selected' : '' }}>Engineering</option>
+                <option value="Marketing" {{ request('department') == 'Marketing' ? 'selected' : '' }}>Marketing
+                </option>
+                <option value="Engineering" {{ request('department') == 'Engineering' ? 'selected' : '' }}>Engineering
+                </option>
             </select>
         </div>
 
@@ -59,7 +61,11 @@
                                 <td>{{ $data->email }}</td>
 
                                 <td>
-                                    {{ is_array($data->department) ? implode(', ', $data->department) : $data->department }}
+                                    @forelse((array) $data->department as $dept)
+                                        <span class="badge bg-info">{{ $dept }}</span>
+                                    @empty
+                                        <span class="text-muted">No Department</span>
+                                    @endforelse
                                 </td>
 
                                 <td><span class="badge bg-info text-dark">{{ $data->experience }} yrs</span></td>
@@ -75,28 +81,18 @@
                                 </td>
 
                                 <td>
-                                    @php
-                                        $images = [];
-                                        if (!empty($data->images)) {
-                                            $images = is_array($data->images)
-                                                ? $data->images
-                                                : (json_decode($data->images, true) ?? [$data->images]);
-                                        }
-                                    @endphp
-
-                                    @if(count($images))
-                                        @foreach ($images as $img)
-                                            <img src="{{ asset('storage/'.$img) }}" width="50" height="50"
-                                                 style="object-fit:cover; border-radius:6px; margin:2px;">
-                                        @endforeach
-                                    @else
+                                    @forelse((array) $data->images as $img)
+                                        <img src="{{ asset('storage/'.$img) }}" width="50" height="50"
+                                            style="object-fit:cover; border-radius:6px; margin:2px;">
+                                    @empty
                                         <span class="text-muted">No Image</span>
-                                    @endif
+                                    @endforelse
                                 </td>
 
                                 <td>
                                     <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('users.edit', $data->id) }}" class="btn btn-warning btn-sm px-3">Edit</a>
+                                        <a href="{{ route('users.edit', $data->id) }}"
+                                            class="btn btn-warning btn-sm px-3">Edit</a>
 
                                         <form action="{{ route('users.destroy', $data->id) }}" method="POST">
                                             @csrf
