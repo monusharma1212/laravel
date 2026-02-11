@@ -1,66 +1,52 @@
-@extends('main')
 
-@section('title', 'Welcome')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 
-@section('content')
+    <!-- ✅ Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
 
-    <!-- 🔹 HERO SECTION -->
-    <div class="text-center py-5">
-        <h1 class="display-4 fw-bold mb-3">Welcome to My Website</h1>
-        <p class="lead text-muted mb-4">
-            We build modern, secure and scalable web applications to help businesses grow digitally.
-        </p>
-    </div>
+    <div class="card shadow p-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4">Login</h3>
 
-    <hr class="my-5">
+        <form method="POST" action="/login">
+            @csrf
 
-    <!-- 🔹 FEATURES -->
-    <div class="row text-center g-4">
-        <div class="col-md-4">
-            <div class="p-4 shadow-sm rounded bg-white h-100">
-                <h4 class="fw-bold">⚡ Fast Performance</h4>
-                <p>Optimized systems ensuring smooth and fast user experience.</p>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input name="email" type="email" class="form-control" placeholder="Enter email" required>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="p-4 shadow-sm rounded bg-white h-100">
-                <h4 class="fw-bold">🔒 Secure System</h4>
-                <p>Advanced authentication and data protection techniques.</p>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Enter password" required>
             </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="p-4 shadow-sm rounded bg-white h-100">
-                <h4 class="fw-bold">🌍 Global Support</h4>
-                <p>Reliable solutions and support for clients worldwide.</p>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/register">Don't have an account? Register</a>
+        </div>
+        <div class="mt-2 text-center">
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
             </div>
+            @endif
         </div>
     </div>
 
-    <hr class="my-5">
 
-    <!-- 🔹 ABOUT PREVIEW -->
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            <h3 class="fw-semibold">Who We Are</h3>
-            <p>
-                We are a passionate team of developers creating high-quality digital products.
-                Our goal is to deliver user-friendly, secure, and scalable applications.
-            </p>
-        </div>
+    <!-- ✅ Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
-        <div class="col-md-6 text-center">
-            <img src="https://thumbs.dreamstime.com/b/autumn-nature-landscape-colorful-forest-autumn-nature-landscape-colorful-forest-morning-sunlight-131400332.jpg"
-                class="img-fluid rounded shadow" alt="Home Image">
-        </div>
-    </div>
 
-    <hr class="my-5">
 
-    <!-- 🔹 CALL TO ACTION -->
-    <div class="text-center py-5 bg-dark text-white rounded">
-        <h3 class="mb-3">Ready to start your project?</h3>
-    </div>
-
-@endsection

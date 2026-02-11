@@ -10,7 +10,7 @@ class HomeController extends Controller
     public function dashboard()
 {
     $users = auth()->user()->role === 'admin'
-                ? User::where('role', '!=', 'admin')->latest()->paginate(10)
+                ? User::where('role', '!=', 'admin')->latest()->paginate(4)
                 : collect();
 
     return view('dashboard', compact('users'));

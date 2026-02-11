@@ -1,5 +1,7 @@
 @extends('main')
 
+@section('hideHeader')  {{-- this hides header --}} @endsection
+
 @section('content')
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -148,9 +150,17 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-12 text-center mt-3">
                         <button class="btn btn-primary px-5">Register</button>
+                    </div>
+                    
+                    <div class="col-12 text-center mt-3">
+                        <p class="mb-0">
+                            Already have an account?
+                            <a href="{{ route('login') }}" class="fw-semibold text-decoration-none">
+                                Login Here
+                            </a>
+                        </p>
                     </div>
 
                 </div>

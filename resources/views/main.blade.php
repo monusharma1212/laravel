@@ -13,7 +13,10 @@
 </head>
 <body>
 
-    @include('layouts.header')
+     {{-- Header --}}
+     @unless(View::hasSection('hideHeader'))
+     @include('layouts.header')
+     @endunless
 
     <main class="container my-5">
         @yield('content')

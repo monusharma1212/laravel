@@ -5,7 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 
 // Public
-Route::get('/', fn() => view('welcome'));
+Route::get('/', fn() => view('welcome'))->name('welcome');
 
 Route::get('/login',[AuthController::class,'showLogin'])->name('login');
 Route::post('/login',[AuthController::class,'login']);
@@ -23,7 +23,7 @@ Route::middleware('auth')->group(function(){
     // Profile (self)
     Route::get('/profile',[UserController::class,'profile'])->name('profile');
     Route::get('/profilEdit',[UserController::class,'profilEdit'])->name('profilEdit');
-    Route::get('/profileUpdate',[UserController::class,'profileUpdate'])->name('profileUpdate');
+    Route::put('/profileUpdate',[UserController::class,'profileUpdate'])->name('profileUpdate');
 
 });
 

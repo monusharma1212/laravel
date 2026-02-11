@@ -7,8 +7,9 @@
 
         <h3 class="fw-bold mb-4 text-center">Edit Profile</h3>
 
-        <form action="{{ route('profileUpdate') }}" method="POST">
+        <form action="{{ route('profileUpdate') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
 
             <div class="row g-3">
 
@@ -30,16 +31,13 @@
                         value="{{ old('experience',$data->experience) }}">
                 </div>
 
+                {{-- Department --}}
                 <div class="col-md-6">
                     <label>Department</label>
                     @php
-                        $departments = old('department');
-
-                        if (!$departments) {
-                            $departments = is_array($data->department)
-                                ? $data->department
-                                : (json_decode($data->department, true) ?? [$data->department]);
-                        }
+                        $departments = old('department') ?: (is_array($data->department)
+                            ? $data->department
+                            : (json_decode($data->department, true) ?? []));
                     @endphp
 
                     <select name="department[]" multiple class="form-select">
@@ -71,12 +69,39 @@
                     <input type="password" name="password" class="form-control">
                 </div>
 
+                {{-- 🖼 IMAGES SECTION --}}
+                <div class="col-12">
+                    <label class="fw-semibold">Upload New Images</label>
+                    <input type="file" name="images[]" multiple class="form-control">
+                </div>
+
+                @if(!empty($data->images))
+                @php
+                    $images = is_array($data->images)
+                        ? $data->images
+                        : (json_decode($data->images, true) ?? []);
+                @endphp
+                <div class="col-12 mt-3">
+                    <label class="fw-semibold">Existing Images</label>
+                    <div class="d-flex flex-wrap gap-3 mt-2">
+                        @foreach($images as $img)
+                            <div class="text-center">
+                                <img src="{{ asset('storage/'.$img) }}" width="90" height="90"
+                                     style="object-fit:cover; border-radius:8px;"><br>
+                                <input type="checkbox" name="delete_images[]" value="{{ $img }}">
+                                <small class="text-danger">Delete</small>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="col-12">
                     <label>Bio</label>
                     <textarea name="bio" class="form-control">{{ $data->bio }}</textarea>
                 </div>
 
-                <div class="col-12 text-center mt-3">
+                <div class="col-12 text-center mt-4">
                     <button class="btn btn-success px-5">Update Profile</button>
                 </div>
 

@@ -28,28 +28,25 @@
 
         {{-- SIDEBAR --}}
         <div class="col-md-2 text-white p-3" id="side">
-
-            <a class="navbar-brand fw-bold text-white d-block mb-4" href="{{ url('/') }}">MyBrand</a>
-
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a href="{{ route('profile') }}"class="btn btn-primary btn-sm w-100 mb-2">My Profile</a>
-                </li>
-            </ul>   
-
-            <hr class="bg-light">
-
+            
+            
             <div class="mt-3">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm w-100 mb-2">Dashboard</a>
-                    <form action="{{ route('logout') }}" method="POST">
+                <a href="{{ route('dashboard') }}" class="btn btn-primary btn-sm w-100 mb-2">Dashboard</a>
+                <hr class="bg-light">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="{{ route('profile') }}"class="btn btn-primary btn-sm w-100 mb-2">My Profile</a>
+                    </li>
+                </ul>   
+                <hr class="bg-light">
+                <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="btn btn-outline-light btn-sm w-100">Logout</button>
                     </form>
                 @endauth
 
                 @guest
-                    <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm w-100 mb-2">Login</a>
                     <a href="{{ route('register') }}" class="btn btn-primary btn-sm w-100">Register</a>
                 @endguest
             </div>
