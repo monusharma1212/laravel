@@ -6,6 +6,7 @@
                 value="{{ request('search') }}">
         </div>
 
+
         <div class="col-md-3">
             <select name="department" class="form-select">
                 <option value="">All Departments</option>
@@ -17,6 +18,12 @@
 
         <div class="col-md-2">
             <button class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-1">
+
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Export </button>
         </div>
     </form>
 
