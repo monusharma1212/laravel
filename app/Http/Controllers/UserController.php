@@ -178,7 +178,7 @@ class UserController extends Controller
             'password' => $req->password ? Hash::make($req->password) : $user->password,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User Updated');
+        return redirect()->route('users.profileShow')->with('success', 'User Updated');
     }
 
     public function destroy($id)
@@ -210,7 +210,7 @@ class UserController extends Controller
             ? \App\Models\User::where('role', '!=', 'admin')->latest()->paginate(10)
             : collect();
 
-        return view('users.index', compact('data', 'users'));
+        return view('users.profileShow', compact('data', 'users'));
     }
 
     public function profilEdit()

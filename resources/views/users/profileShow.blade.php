@@ -9,9 +9,9 @@
 
             {{-- HEADER --}}
             <div class="text-white text-center p-5"
-                style="background: linear-gradient(135deg, #1f1f1f, {{ $data->theme_color }});">
-                <h2 class="fw-bold mb-1">{{ $data->name }}</h2>
-                <span class="badge bg-light text-dark px-3 py-2 fs-6">
+                style="background: linear-gradient(120deg, #bbab12 , {{ $data->theme_color }});">
+                <h2 class="fw-bold mb-1">{{ ucfirst($data->name) }}</h2>
+                <span class="badge bg-light text-dark px-3 py-2 mt-2 fs-6">
                     {{ ucfirst($data->role) }}
                 </span>
             </div>

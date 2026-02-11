@@ -30,7 +30,7 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="/register">Don't have an account? Register</a>
+            <a href="/register">Don't have an   ? Register</a>
         </div>
         <div class="mt-2 text-center">
             @if ($errors->any())

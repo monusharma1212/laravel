@@ -35,8 +35,8 @@ class AuthController extends Controller
             'department.*' => 'in:Engineering,Design,Marketing',
 
         
-            'images'      => 'required',
-            'images.*'    => 'required|image|mimes:jpg,jpeg,png,webp|max:20280',
+            'images'   => 'required|array|min:1',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
         
             'color'       => 'required|string',
             'skill_level' => 'required|numeric',
@@ -89,12 +89,7 @@ class AuthController extends Controller
         ])) {
 
             $req->session()->regenerate();
-
-            if (Auth::user()->role == 'admin') {
-                return redirect()->route('dashboard');
-            } else {
-                return redirect()->route('dashboard');
-            }
+            return redirect()->route('dashboard');
         }
 
         // ❌ If login fails

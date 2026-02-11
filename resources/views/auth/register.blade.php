@@ -38,7 +38,7 @@
                     {{-- Password --}}
                     <div class="col-md-6">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password"
+                        <input type="password" name="password" value="{{ old('password') }}"
                                class="form-control @error('password') is-invalid @enderror">
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -48,7 +48,7 @@
                     {{-- Birth Date --}}
                     <div class="col-md-6">
                         <label class="form-label">Birth Date</label>
-                        <input type="date" name="birth_date"
+                        <input type="date" name="birth_date" value="{{ old('birth_date') }}"
                                class="form-control @error('birth_date') is-invalid @enderror">
                         @error('birth_date')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -94,9 +94,9 @@
                     {{-- Images --}}
                     <div class="col-md-6">
                         <label class="form-label">Upload Images</label>
-                        <input type="file" name="images[]" multiple
+                        <input type="file" name="images[]" multiple value="{{ old('images') }}"
                                class="form-control @error('images.*') is-invalid @enderror">
-                        @error('images.*')
+                        @error('images')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
