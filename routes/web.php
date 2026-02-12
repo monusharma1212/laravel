@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function(){
 // Admin only
 Route::middleware(['auth','admin'])->group(function () {
     Route::resource('users', UserController::class);
+    route::get('/users/export/csv',[UserController::class,'exportCsv'])->name('users.export.csv');
+    route::get('/users/export/pdf',[UserController::class,'exportPdf'])->name('users.export.pdf');
 });
 
 Route::post('/logout', [AuthController::class,'logout'])
