@@ -213,17 +213,10 @@ class UserController extends Controller
 
                 while (Storage::disk('public')->exists($path)) {
                     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
-<<<<<<< HEAD
                                 .'_'.$counter.'.'
                                 .$file->getClientOriginalExtension();
 
                     $path = 'users/'.$filename;
-=======
-                        . '_' . $counter . '.'
-                        . $file->getClientOriginalExtension();
-
-                    $path = 'users/' . $filename;
->>>>>>> 174c52b (custome_validation message)
                     $counter++;
                 }
 
