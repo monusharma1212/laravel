@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rule;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends Controller
 {
@@ -35,22 +37,6 @@ class UserController extends Controller
         return view('dashboard', compact('users'));
     }
 
-<<<<<<< HEAD
-    // Department filter
-    if ($request->department) {
-        $query->whereJsonContains('department', $request->department);
-    }
-
-    $users = $query->latest()->paginate(4)->withQueryString();
-
-    return view('dashboard', compact('users'));
-}
-
-
-
-
-=======
->>>>>>> 174c52b (custome_validation message)
     public function create()
     {
         return view('admin.create-user');
@@ -58,48 +44,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'dob' => 'required|date',
-            'experience' => 'required|integer|min:0|max:50',
-            'department' => 'required|array',
-            'department.*' => 'in:Engineering,Design,Marketing',
-            'skill_level' => 'required|integer|min:1|max:10',
-            'shift' => 'required|in:day,night',
-            'theme_color' => 'required|string',
-            'bio' => 'required|string|max:1000',
-            'role' => 'nullable|in:user,admin',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:10240',
-        ]);
-<<<<<<< HEAD
-
-            $imagePaths = [];
-
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $file) {
-
-                    // original file name
-                    $filename = $file->getClientOriginalName();
-
-                    // agar same naam already exist kare to rename na ho isliye unique suffix
-                    $path = 'users/'.$filename;
-                    $counter = 1;
-
-                    while (Storage::disk('public')->exists($path)) {
-                        $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
-                                    .'_'.$counter.'.'
-                                    .$file->getClientOriginalExtension();
-
-                        $path = 'users/'.$filename;
-                        $counter++;
-                    }
-
-                    $file->storeAs('users', $filename, 'public');
-                    $imagePaths[] = $path;
-=======
+ 
 
         $imagePaths = [];
 
@@ -119,7 +64,6 @@ class UserController extends Controller
 
                     $path = 'users/' . $filename;
                     $counter++;
->>>>>>> 174c52b (custome_validation message)
                 }
 
                 $file->storeAs('users', $filename, 'public');
@@ -143,18 +87,9 @@ class UserController extends Controller
             'images' => $imagePaths,
         ]);
 
-<<<<<<< HEAD
-        return redirect()->route('dashboard')->with('success','User Created');
-    }
-
-
-
-
-=======
         return redirect()->route('dashboard')->with('success', 'User Created');
     }
 
->>>>>>> 174c52b (custome_validation message)
     public function edit($id)
     {
         $user = User::findOrFail($id);
@@ -175,14 +110,10 @@ class UserController extends Controller
             'theme_color' => 'required|string',
             'bio' => 'required|string|max:1000',
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:10240'
-<<<<<<< HEAD
-        ]);
-=======
         ],
             [
                 'email.unique' => 'This Email is already Taken Custome Message'
             ]);
->>>>>>> 174c52b (custome_validation message)
 
         // ✅ STEP 1 — Purani images load karo
         $existingImages = [];
@@ -203,10 +134,6 @@ class UserController extends Controller
         // ✅ STEP 3 — New images add karo (old ke saath merge)
         if ($req->hasFile('images')) {
             foreach ($req->file('images') as $file) {
-<<<<<<< HEAD
-
-=======
->>>>>>> 174c52b (custome_validation message)
                 $filename = $file->getClientOriginalName();
                 $path = 'users/' . $filename;
                 $counter = 1;
@@ -242,28 +169,10 @@ class UserController extends Controller
             'images' => array_values($existingImages),  // 🧠 old + new both
             'password' => $req->password ? Hash::make($req->password) : $user->password,
         ]);
-<<<<<<< HEAD
-
-        return redirect()->route('users.index')->with('success','User Updated');
-    }
-
-
-
-
-=======
->>>>>>> 174c52b (custome_validation message)
 
         return redirect()->route('users.index')->with('success', 'User Updated');
     }
 
-<<<<<<< HEAD
-    $user->delete();
-
-    return redirect()->route('dashboard')->with('success', 'User deleted successfully');
-}
-
-
-=======
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -287,7 +196,7 @@ class UserController extends Controller
 
     public function exportCsv()
     {
-        $users = User::all();
+        $users = User::where('role','!=','admin')->get();
 
         $filename = 'users.csv';
 
@@ -322,16 +231,20 @@ class UserController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
-    }
->>>>>>> 174c52b (custome_validation message)
+    }   
 
 
     public function exportPdf()
     {
-        $users = User::all();
+        $users = User::where('role','!=','admin')->get();
 
-        $pdf = Pdf::loadView('users.pdf', compact('users'))->setPaper('a4', 'landscape'); // 👈 yaha change
+        $pdf = Pdf::loadView('users.pdf', compact('users'))->setPaper('a4', 'landscape'); 
 
         return $pdf->download('users.pdf');
+    }
+
+    public function exportExcel(){
+
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 }

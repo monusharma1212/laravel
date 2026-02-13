@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-<<<<<<< HEAD
-    use HasFactory, Notifiable;
-=======
-    use HasApiTokens,HasFactory, Notifiable, SoftDeletes;
->>>>>>> 174c52b (custome_validation message)
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

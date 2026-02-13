@@ -29,6 +29,7 @@ Route::middleware(['auth','admin'])->group(function () {
     Route::resource('users', UserController::class);
     route::get('/users/export/csv',[UserController::class,'exportCsv'])->name('users.export.csv');
     route::get('/users/export/pdf',[UserController::class,'exportPdf'])->name('users.export.pdf');
+    route::get('/users/export/excel',[UserController::class,'exportExcel'])->name('users.export.excel');
 });
 
 Route::post('/logout', [AuthController::class,'logout'])
@@ -36,3 +37,4 @@ Route::post('/logout', [AuthController::class,'logout'])
     ->middleware('auth');
 
 
+    
