@@ -19,7 +19,7 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
                     $user->email,
                     is_array($user->department)
                         ? implode(', ', $user->department)
-                        : $user->department,
+                        : $user->department,    
                     $user->experience,
                     $user->skill_level,
                     $user->shift,
@@ -28,7 +28,7 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
                 ];
             });
     }
-
+    
     public function headings(): array
     {
         return [
