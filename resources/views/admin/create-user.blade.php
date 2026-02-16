@@ -1,146 +1,178 @@
 @extends('main')
 
 @section('content')
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
 
-            <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-body p-4">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-4">
 
+                        <h3 class="text-center mb-4">
+                            {{ isset($user) ? 'Update User' : 'Create User' }}
+                        </h3>
 
-                    <form action="{{ isset($user) ? route('users.update',$user->id) : route('users.store') }}"
-                          method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @if(isset($user)) @method('PUT') @endif
-                        <h1 class="text-center  text-red-600">Create Users</h1>
+                        <form id="userForm"
+                            action="{{ isset($user) ? route('users.update', $user->id) : route('users.store') }}"
+                            method="POST" enctype="multipart/form-data">
 
-                        <div class="row g-3">
+                            @csrf
+                            @if (isset($user))
+                                @method('PUT')
+                            @endif
 
-                            {{-- Name --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Full Name</label>
-                                <input type="text" name="name"
-                                       class="form-control @error('name') is-invalid @enderror"
-                                       value="{{ old('name', $user->name ?? '') }}">
-                                @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label>Name</label>
+                                    <input type="text" name="name" class="form-control"
+                                        value="{{ $user->name ?? '' }}">
+                                    <span class="text-danger error-text name_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Email</label>
+                                    <input type="email" name="email" class="form-control"
+                                        value="{{ $user->email ?? '' }}">
+                                    <span class="text-danger error-text email_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Password</label>
+                                    <input type="password" name="password" class="form-control">
+                                    <span class="text-danger error-text password_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>DOB</label>
+                                    <input type="date" name="dob" class="form-control"
+                                        value="{{ $user->dob ?? '' }}">
+                                    <span class="text-danger error-text dob_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Experience</label>
+                                    <input type="number" name="experience" class="form-control"
+                                        value="{{ $user->experience ?? '' }}">
+                                    <span class="text-danger error-text experience_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Department</label>
+                                    <select name="department[]" multiple class="form-control">
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Design">Design</option>
+                                        <option value="Marketing">Marketing</option>
+                                    </select>
+                                    <span class="text-danger error-text department_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Images</label>
+                                    <input type="file" name="images[]" multiple class="form-control">
+                                    <span class="text-danger error-text images_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Theme Color</label>
+                                    <input type="color" name="theme_color" value="{{ $user->theme_color ?? '#000000' }}"
+                                        class="form-control">
+                                    <span class="text-danger error-text theme_color_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Skill</label>
+                                    <input type="range" name="skill_level" value="{{ $user->skill_level ?? 5 }}"
+                                        class="form-control">
+                                    <span class="text-danger error-text skill_level_error"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Shift</label><br>
+                                    <input type="radio" name="shift" value="day"> Day
+                                    <input type="radio" name="shift" value="night"> Night
+                                    <span class="text-danger error-text shift_error"></span>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Bio</label>
+                                    <textarea name="bio" class="form-control">{{ $user->bio ?? '' }}</textarea>
+                                    <span class="text-danger error-text bio_error"></span>
+                                </div>
+
+                                <div class="col-md-12 text-center mt-3">
+                                    <button class="btn btn-success">
+                                        {{ isset($user) ? 'Update User' : 'Create User' }}
+                                    </button>
+                                </div>
+
                             </div>
+                        </form>
 
-                            {{-- Email --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Email</label>
-                                <input type="email" name="email"
-                                       class="form-control @error('email') is-invalid @enderror"
-                                       value="{{ old('email', $user->email ?? '') }}">
-                                @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Password --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">
-                                    Password {{ isset($user) ? '(leave blank if no change)' : '' }}
-                                </label>
-                                <input type="password" name="password"
-                                value="{{ old('dob', $user->password ?? '') }}"
-                                       class="form-control @error('password') is-invalid @enderror">
-                                @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- DOB --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Birth Date</label>
-                                <input type="date" name="dob"
-                                       class="form-control @error('dob') is-invalid @enderror"
-                                       value="{{ old('dob', $user->dob ?? '') }}">
-                                @error('dob') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Experience --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Experience (Years)</label>
-                                <input type="number" name="experience"
-                                    class="form-control @error('experience') is-invalid @enderror"
-                                    value="{{ old('experience', $user->experience ?? '') }}">
-                                @error('experience') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Department --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Department</label>
-                            
-                                <select name="department[]" multiple
-                                    class="form-select @error('department') is-invalid @enderror">
-                            
-                                    @php
-                                        $selectedDepartments = old('department', isset($user) ? (array)$user->department : []);
-                                    @endphp
-                            
-                                    <option value="Engineering" {{ in_array('Engineering', $selectedDepartments) ? 'selected' : '' }}>Engineering</option>
-                                    <option value="Design" {{ in_array('Design', $selectedDepartments) ? 'selected' : '' }}>Design</option>
-                                    <option value="Marketing" {{ in_array('Marketing', $selectedDepartments) ? 'selected' : '' }}>Marketing</option>
-                                </select>
-                            
-                                @error('department') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                            </div>
-                            
-
-                            {{-- Images --}}
-                            <div class="col-md-6">
-                                <label class="form-label">Upload Images</label>
-                                <input type="file" name="images[]" multiple
-                                       class="form-control @error('images.*') is-invalid @enderror">
-                                @error('images.*') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Theme --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Theme Color</label>
-                                <input type="color" name="theme_color"
-                                       class="form-control form-control-color w-100 @error('theme_color') is-invalid @enderror"
-                                       value="{{ old('theme_color', $user->theme_color ?? '#000000') }}">
-                                @error('theme_color') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Skill --}}
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Skill Level</label>
-                                <input type="range" name="skill_level" min="1" max="10"
-                                       class="form-range @error('skill_level') is-invalid @enderror"
-                                       value="{{ old('skill_level', $user->skill_level ?? 5) }}">
-                                @error('skill_level') <div class="text-danger small">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Shift --}}
-                            <div class="col-md-6">
-                                <label class="fw-semibold d-block">Shift</label>
-                                <input type="radio" name="shift" value="day"
-                                    {{ old('shift',$user->shift ?? '')=='day'?'checked':'' }}> Day
-                                <input type="radio" name="shift" value="night"
-                                    {{ old('shift',$user->shift ?? '')=='night'?'checked':'' }}> Night
-                                @error('shift') <div class="text-danger small">{{ $message }}</div> @enderror
-                            </div>
-
-                            {{-- Bio --}}
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Bio</label>
-                                <textarea name="bio" value="{{ old('bio', $user->bio ?? '') }}"
-                                class="form-control @error('bio') is-invalid @enderror">{{ old('bio',$user->bio ?? '') }}</textarea>
-                                @error('bio') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="col-12 text-center mt-4">
-                                <button class="btn btn-success px-5">
-                                    {{ isset($user) ? 'Update User' : 'Create User' }}
-                                </button>
-                            </div>
-
-                        </div>
-                    </form>
-
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
+@endsection
+
+
+@section('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            let form = document.getElementById("userForm");
+
+            form.addEventListener("submit", function(e) {
+
+                e.preventDefault(); // STOP REFRESH
+
+                let formData = new FormData(form);
+
+                document.querySelectorAll('.error-text')
+                    .forEach(el => el.innerHTML = '');
+
+                fetch(form.action, {
+
+                        method: "POST",
+
+                        body: formData,
+
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        }
+
+                    })
+                    .then(async response => {
+
+                        let data = await response.json();
+
+                        if (response.status === 422) {
+
+                            Object.keys(data.errors).forEach(field => {
+
+                                let el =
+                                    document.querySelector('.' + field + '_error');
+
+                                if (el) {
+                                    el.innerHTML = data.errors[field][0];
+                                }
+
+                            });
+
+                        } else if (response.ok) {
+
+                            window.location.href = data.redirect;
+
+                        }
+
+
+                    });
+
+            });
+
+        });
+    </script>
 @endsection

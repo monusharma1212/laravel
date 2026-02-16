@@ -30,7 +30,7 @@ class AuthController extends Controller
             'password'    => 'required|min:6',
         
             'birth_date'  => 'required',   // no strict date rule
-            'experience'  => 'required|numeric',
+            'experience'  => 'required|numeric|max:50',
             'department'   => 'required|array',
             'department.*' => 'in:Engineering,Design,Marketing',
 
@@ -60,7 +60,7 @@ class AuthController extends Controller
             'password'    => Hash::make($request->password),
             'dob'         => $request->birth_date,
             'experience'  => $request->experience,
-            'department' => json_encode($request->department),
+            'department' => $request->department,
             'images'      => json_encode($imagePaths),
             'theme_color' => $request->color,
             'skill_level' => $request->skill_level,

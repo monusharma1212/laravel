@@ -51,7 +51,7 @@ th {
             <th>Role</th>
             <th>Date of Birth</th>
             <th class="images-cell">Images</th>
-        </tr>
+        </tr>   
     </thead>
 
     <tbody>
@@ -62,22 +62,34 @@ th {
             <td>{{ $user->email }}</td>
 
             <td>
-                {{ is_array($user->department) 
-                    ? implode(', ', $user->department) 
-                    : $user->department }}
+                @php
+                $departments = is_array($user->department)
+                    ? $user->department
+                    : json_decode($user->department, true);
+                @endphp
+                
+                {{ implode(', ', $departments ?? []) }}
             </td>
 
             <td>{{ $user->experience }}</td>
             <td>{{ $user->role }}</td>
             <td>{{ $user->dob }}</td>
 
-            <td class="images-cell" >
-                <div style="margin-top:10px;"> 
-                    @foreach ($user->images ?? [] as $img)
-                    <span class="image-wrapper">
-                        <img src="{{ public_path('storage/' . $img) }}">
-                    </span>
+            <td class="images-cell">
+                <div style="margin-top:10px;">
+            
+                    @php
+                        $images = is_array($user->images)
+                            ? $user->images
+                            : json_decode($user->images, true);
+                    @endphp
+            
+                    @foreach ($images ?? [] as $img)
+                        <span class="image-wrapper">
+                            <img src="{{ public_path('storage/' . $img) }}" width="60">
+                        </span>
                     @endforeach
+            
                 </div>
             </td>
         </tr>

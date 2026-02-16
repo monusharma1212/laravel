@@ -1,3 +1,4 @@
+@include('admin.models.allmodel')
 <div class="container-fluid py-5 w-100">
 
     <div class="d-flex flex-wrap align-items-end justify-content-between gap-1 mb-3">
@@ -73,12 +74,20 @@
                                 <td>{{ $data->email }}</td>
 
                                 <td>
-                                    @forelse((array) $data->department as $dept)
+                                    @php
+                                        $departments = is_array($data->department)
+                                            ? $data->department
+                                            : json_decode($data->department, true);
+                                    @endphp
+                                
+                                    @forelse($departments ?? [] as $dept)
                                         <span class="badge bg-info">{{ $dept }}</span>
                                     @empty
                                         <span class="text-muted">No Department</span>
                                     @endforelse
                                 </td>
+                                
+                                
 
                                 <td><span class="badge bg-info text-dark">{{ $data->experience }} yrs</span></td>
                                 <td>{{ $data->skill_level }}</td>
@@ -119,12 +128,13 @@
                                         Edit
                                     </a>
                                 
-                                    <button class="btn btn-danger btn-sm px-2"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal{{ $data->id }}">
-                                        Delete
-                                    </button>
-                                </td>
+                                    <button class="btn btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                        onclick="setDeleteId({{ $data->id }})">
+                                    Delete
+                                </button>
+                            </td>
                                 
                                 
                                 @endforeach

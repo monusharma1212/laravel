@@ -35,13 +35,10 @@ class User extends Authenticatable
                 'newsletter',
                 'images'
             ];
-            protected function casts(): array
-            {
-                return [
-                    'images' => 'array',
-                    'department' => 'array',
-                ];
-            }
+            protected $casts = [
+                'department' => 'array',
+                'images' => 'array',
+            ];
         /**
      * The attributes that should be hidden for serialization.
      *
