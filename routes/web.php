@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/dashboard',[ProfileController::class,'dashboard'])->name('dashboard');
     Route::get('/profile',[ProfileController::class,'profile'])->name('profile');
     Route::get('/profilEdit',[ProfileController::class,'profilEdit'])->name('profilEdit');
-    Route::put('/profileUpdate',[ProfileController::class,'profileUpdate'])->name('profileUpdate');
+    Route::post('/profileUpdate',[ProfileController::class,'profileUpdate'])->name('profileUpdate');
 
 });
 

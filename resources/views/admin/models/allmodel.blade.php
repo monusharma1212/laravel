@@ -1,3 +1,4 @@
+<!-- DELETE MODAL -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -12,33 +13,59 @@
             </div>
 
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Cancel
                 </button>
 
-                <form id="deleteForm" method="POST">
-                    @csrf
-                    @method('DELETE')
-
-                    <button type="submit" class="btn btn-danger">
-                        Yes, Delete
-                    </button>
-                </form>
-
+                <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
+                    Yes, Delete
+                </button>
             </div>
 
         </div>
     </div>
 </div>
 
+{{-- Export-logic --}}
+
 <script>
-function setDeleteId(id)
-{
-    var form = document.getElementById('deleteForm');
-    form.action = "/users/" + id;
-}
+    document.addEventListener("DOMContentLoaded", function() {
+
+        deleteId = null;
+
+        window.setDeleteId = function(id) {
+            deleteId = id;
+        };
+
+        document.getElementById("confirmDeleteBtn").addEventListener("click", function() {
+
+            if (!deleteId) return;
+
+            fetch(`{{ url('users') }}/${deleteId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Request failed");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error("Delete error:", err));
+        });
+
+    });
 </script>
+
+
+
+<!-- EXPORT MODAL -->
 
 <div class="modal fade" id="exportModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -50,7 +77,6 @@ function setDeleteId(id)
             </div>
 
             <div class="modal-body text-center">
-
                 <a href="{{ route('users.export.csv') }}" class="btn btn-success m-2 px-4" onclick="closeExportModal()">
                     Export CSV
                 </a>
@@ -58,6 +84,7 @@ function setDeleteId(id)
                 <a href="{{ route('users.export.pdf') }}" class="btn btn-danger m-2 px-4" onclick="closeExportModal()">
                     Export PDF
                 </a>
+
                 <a href="{{ route('users.export.excel') }}" class="btn btn-primary m-2 px-4" onclick="closeExportModal()">
                     Export EXCEL
                 </a>
@@ -66,3 +93,28 @@ function setDeleteId(id)
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        var exportModalEl = document.getElementById('exportModal');
+
+        if (exportModalEl) {
+
+            var exportModal = new bootstrap.Modal(exportModalEl);
+
+            exportModalEl.addEventListener('hidden.bs.modal', function() {
+                document.querySelector('#openExportBtn')?.focus();
+            });
+
+        }
+    });
+    function closeExportModal() {
+        var modalEl = document.getElementById('exportModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            modal.hide();
+        }
+    }
+</script>

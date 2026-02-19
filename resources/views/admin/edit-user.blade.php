@@ -223,8 +223,8 @@
 
             form.addEventListener("submit", function(e) {
 
-                e.preventDefault(); // STOP refresh
-
+                e.preventDefault(); 
+                
                 let formData = new FormData(form);
 
                 document.querySelectorAll('.error-text')

@@ -42,7 +42,7 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
             'Role'
         ];
     }
-
+    
     public function styles(Worksheet $sheet)
     {
         $sheet->getStyle('A1:H1')->applyFromArray([

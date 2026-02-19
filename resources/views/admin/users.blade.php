@@ -72,7 +72,6 @@
                             <tr>
                                 <td class="fw-semibold">{{ $data->name }}</td>
                                 <td>{{ $data->email }}</td>
-
                                 <td>
                                     @php
                                         $departments = is_array($data->department)
@@ -86,9 +85,6 @@
                                         <span class="text-muted">No Department</span>
                                     @endforelse
                                 </td>
-                                
-                                
-
                                 <td><span class="badge bg-info text-dark">{{ $data->experience }} yrs</span></td>
                                 <td>{{ $data->skill_level }}</td>
                                 <td>{{ $data->shift }}</td>
@@ -127,21 +123,16 @@
                                        class="btn btn-warning btn-sm px-2">
                                         Edit
                                     </a>
-                                
                                     <button class="btn btn-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
                                         onclick="setDeleteId({{ $data->id }})">
-                                    Delete
-                                </button>
-                            </td>
-                                
-                                
-                                @endforeach
+                                        Delete
+                                    </button>
+                                </td>
+                            @endforeach
                     </tbody>
                 </table>
-
-
             </div>
         </div>
     </div>
@@ -151,13 +142,6 @@
 <div class="d-flex justify-content-center mt-4" id="paginate">
     {{ $users->links('pagination::bootstrap-5') }}
 </div>
-
-<script>
-    function closeExportModal() {
-        var modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
-        modal.hide();
-    }
-</script>
 
 <style>
     .pagination {

@@ -1,6 +1,6 @@
 <?php
 namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -176,30 +176,44 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-
-        // 🧠 Make sure images are always array
+        $user = User::find($id);
+    
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User already deleted'
+            ]);
+        }
+    
+        // Make sure images are array
         $images = is_array($user->images)
             ? $user->images
             : (json_decode($user->images, true) ?? []);
-
-        // 🗑 Delete images from storage
+    
         foreach ($images as $img) {
             if ($img && Storage::disk('public')->exists($img)) {
                 Storage::disk('public')->delete($img);
             }
         }
-
+    
         $user->forceDelete();
-
-        return redirect()->route('dashboard')->with('success', 'User deleted successfully');
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
     }
+    
+
+
+    // ---  exports file --- // 
+
 
     public function exportCsv()
     {
         $users = User::where('role','!=','admin')->get();
 
-        $filename = 'users.csv';
+        $filename = 'userRecords.csv';
 
         $headers = [
             'Content-type' => 'text/csv',
@@ -220,14 +234,14 @@ class UserController extends Controller
                     $user->name,
                     $user->email,
                     is_array($user->department) ? implode(', ', $user->department) : $user->department,
-                    $user->experience,
+                    $user->experience,  
                     $user->skill_level,
                     $user->shift,
                     $user->dob,
-                    $user->role
+                    $user->role 
                 ]);
             }
-
+  
             fclose($file);
         };
 
@@ -242,6 +256,7 @@ class UserController extends Controller
         $pdf = Pdf::loadView('users.pdf', compact('users'))->setPaper('a4', 'landscape'); 
 
         return $pdf->download('users.pdf');
+        
     }
 
     public function exportExcel(){

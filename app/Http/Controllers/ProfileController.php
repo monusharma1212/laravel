@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;  
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 
@@ -40,74 +42,82 @@ class ProfileController extends Controller
         return view('users.profile-edit', compact('data'));
     }
 
-
     public function profileUpdate(Request $request)
-{
-    $user = Auth::user();
-
-    $request->validate([
-        'name'        => 'required|string|max:255',
-        'email'       => ['required','email', Rule::unique('users')->ignore($user->id)],
-        'experience'  => 'required|integer|min:0|max:50',
-
-        'department'      => 'required|array|min:1',
-        'department.*'    => 'string',
-
-        'skill_level' => 'required|integer|min:1|max:100',
-        'shift'       => 'required|in:day,night',
-        'theme_color' => 'required|string',
-        'bio'         => 'nullable|string|max:500',
-
-        'password' => 'nullable|min:6|confirmed',
-
-        'images'   => 'nullable|array',
-        'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
-
-        'delete_images'   => 'nullable|array',
-        'delete_images.*' => 'string',
-    ]);
-
-    // existing images
-    $existingImages = is_array($user->images)
-        ? $user->images
-        : (json_decode($user->images, true) ?? []);
-
-    // delete images
-    if ($request->delete_images) {
-        foreach ($request->delete_images as $img) {
-            if (in_array($img, $existingImages)) {
-                Storage::disk('public')->delete($img);
-                $existingImages = array_diff($existingImages, [$img]);
+    {
+        $user = Auth::user();
+    
+        $validator = Validator::make($request->all(), [
+            'name'        => 'required|string|max:255',
+            'email'       => ['required','email', Rule::unique('users')->ignore($user->id)],
+            'experience'  => 'required|integer|min:0|max:50',
+            'department'      => 'required|array|min:1',
+            'department.*'    => 'string',
+            'skill_level' => 'required|integer|min:1|max:100',
+            'shift'       => 'required|in:day,night',
+            'theme_color' => 'required|string',
+            'bio'         => 'nullable|string|max:500',
+            'password' => 'nullable|min:6|confirmed',
+            'images'   => 'nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+    
+            'delete_images'   => 'nullable|array',
+            'delete_images.*' => 'string',
+        ],
+        [
+            'email.unique'=>'This Email is Alreday Taken Custom Message'
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+    
+        // existing images
+        $existingImages = is_array($user->images)
+            ? $user->images
+            : (json_decode($user->images, true) ?? []);
+    
+        // delete images
+        if ($request->delete_images) {
+            foreach ($request->delete_images as $img) {
+                if (in_array($img, $existingImages)) {
+                    Storage::disk('public')->delete($img);
+                    $existingImages = array_diff($existingImages, [$img]);
+                }
             }
         }
-    }
-
-    // add new images
-    if ($request->hasFile('images')) {
-        foreach ($request->file('images') as $file) {
-            $path = $file->store('users', 'public');
-            $existingImages[] = $path;
+    
+        // add new images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $path = $file->store('users', 'public');
+                $existingImages[] = $path;
+            }
         }
+    
+        // update user
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'experience' => $request->experience,
+            'department' => $request->department,
+            'skill_level' => $request->skill_level,
+            'shift' => $request->shift,
+            'theme_color' => $request->theme_color,
+            'bio' => $request->bio,
+            'images' => array_values($existingImages),
+            'password' => $request->password 
+                            ? Hash::make($request->password) 
+                            : $user->password,
+        ]);
+    
+        return response()->json([
+            'redirect' => route('profile'),
+            'message' => 'Profile updated successfully'
+        ]);
     }
-
-    // update user
-    $user->update([
-        'name' => $request->name,
-        'email' => $request->email,
-        'experience' => $request->experience,
-        'department' => $request->department, // FIXED
-        'skill_level' => $request->skill_level,
-        'shift' => $request->shift,
-        'theme_color' => $request->theme_color,
-        'bio' => $request->bio,
-        'images' => array_values($existingImages),
-        'password' => $request->password ? Hash::make($request->password) : $user->password,
-    ]);
-
-    return redirect()->route('profile')
-        ->with('success','Profile updated successfully');
-}
-
+    
     
 
 }

@@ -114,6 +114,9 @@
     </div>
 @endsection
 
+
+
+
 @section('scripts')
     <script>
         document.getElementById('registerForm').addEventListener('submit', function(e) {
