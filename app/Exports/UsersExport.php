@@ -5,6 +5,7 @@ use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class UsersExport implements FromCollection, WithHeadings, WithStyles
@@ -19,16 +20,17 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
                     $user->email,
                     is_array($user->department)
                         ? implode(', ', $user->department)
-                        : $user->department,    
+                        : $user->department,
                     $user->experience,
                     $user->skill_level,
                     $user->shift,
                     $user->dob,
                     $user->role,
                 ];
-            });
+            }
+        );
     }
-    
+
     public function headings(): array
     {
         return [
@@ -39,12 +41,14 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
             'Skill Level',
             'Shift',
             'DOB',
-            'Role'
+            'Role',
         ];
     }
-    
+
     public function styles(Worksheet $sheet)
     {
+        $highestColumn = $sheet->getHighestColumn();
+        $highestRow = $sheet->getHighestRow();
         $sheet->getStyle('A1:H1')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -56,13 +60,18 @@ class UsersExport implements FromCollection, WithHeadings, WithStyles
             ],
         ]);
 
-        $highestColumn = $sheet->getHighestColumn();
-        $highestRow = $sheet->getHighestRow();
-
         $sheet->getStyle('A2:' . $highestColumn . $highestRow)->applyFromArray([
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'FFF9C4'],
+            ],
+        ]);
+        $sheet->getStyle('A1:' . $highestColumn . $highestRow)->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
             ],
         ]);
     }

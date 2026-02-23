@@ -26,12 +26,11 @@
     </div>
 </div>
 
-{{-- Export-logic --}}
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        deleteId = null;
+        let deleteId = null;
 
         window.setDeleteId = function(id) {
             deleteId = id;
@@ -85,10 +84,10 @@
                     Export PDF
                 </a>
 
-                <a href="{{ route('users.export.excel') }}" class="btn btn-primary m-2 px-4" onclick="closeExportModal()">
+                <a href="{{ route('users.export.excel') }}" class="btn btn-primary m-2 px-4"
+                    onclick="closeExportModal()">
                     Export EXCEL
                 </a>
-
             </div>
         </div>
     </div>
@@ -110,6 +109,7 @@
 
         }
     });
+
     function closeExportModal() {
         var modalEl = document.getElementById('exportModal');
         var modal = bootstrap.Modal.getInstance(modalEl);

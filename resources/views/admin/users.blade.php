@@ -68,7 +68,7 @@
                     </thead>
 
                     <tbody>
-                        @foreach ($users as $data)
+                        @forelse ($users as $data)
                             <tr>
                                 <td class="fw-semibold">{{ $data->name }}</td>
                                 <td>{{ $data->email }}</td>
@@ -78,7 +78,7 @@
                                             ? $data->department
                                             : json_decode($data->department, true);
                                     @endphp
-                                
+                    
                                     @forelse($departments ?? [] as $dept)
                                         <span class="badge bg-info">{{ $dept }}</span>
                                     @empty
@@ -88,15 +88,15 @@
                                 <td><span class="badge bg-info text-dark">{{ $data->experience }} yrs</span></td>
                                 <td>{{ $data->skill_level }}</td>
                                 <td>{{ $data->shift }}</td>
-                                <td>{{ $data->dob }}</td>
+                                <td>{{ \Carbon\Carbon::parse($data->dob)->format('Y-m-d') }}</td>
                                 <td>{{ $data->role }}</td>
-
+                    
                                 <td>
                                     <span class="badge" style="background-color: {{ $data->theme_color }}">
                                         {{ $data->theme_color }}
                                     </span>
                                 </td>
-
+                    
                                 <td>
                                     @php
                                         $images = [];
@@ -106,21 +106,20 @@
                                                 : json_decode($data->images, true) ?? [$data->images];
                                         }
                                     @endphp
-                                
+                    
                                     @if (count($images))
                                         @foreach ($images as $img)
-                                            <img src="{{ asset('storage/' . $img) }}"
-                                                 width="50"
-                                                 height="50"
-                                                 style="object-fit:cover; border-radius:6px; margin:2px;">
+                                            <img src="{{ asset('storage/' . $img) }}" width="50" height="50"
+                                                style="object-fit:cover; border-radius:6px; margin:2px;">
                                         @endforeach
                                     @else
                                         <span class="text-muted">No Image</span>
                                     @endif
                                 </td>
+                    
                                 <td>
                                     <a href="{{ route('users.edit', $data->id) }}"
-                                       class="btn btn-warning btn-sm px-2">
+                                        class="btn btn-warning btn-sm px-2">
                                         Edit
                                     </a>
                                     <button class="btn btn-danger"
@@ -130,7 +129,15 @@
                                         Delete
                                     </button>
                                 </td>
-                            @endforeach
+                            </tr>
+                    
+                        @empty
+                            <tr>
+                                <td colspan="11" class="text-center text-muted py-4">
+                                    🚫 No Data Found
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

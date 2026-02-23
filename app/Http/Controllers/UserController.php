@@ -1,14 +1,14 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class UserController extends Controller
 {
@@ -27,19 +27,14 @@ class UserController extends Controller
 
         // Department filter
         if ($request->filled('department')) {
-
             $departments = (array) $request->department;
-        
+
             $query->where(function ($q) use ($departments) {
-        
                 foreach ($departments as $dept) {
                     $q->orWhereJsonContains('department', $dept);
                 }
-        
             });
-        
         }
-        
 
         $users = $query->latest()->paginate(4)->withQueryString();
 
@@ -67,30 +62,29 @@ class UserController extends Controller
         ], [
             'email.unique' => 'This Email is already Taken Custom Message'
         ]);
-    
+
         $imagePaths = [];
-    
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-    
                 $filename = $file->getClientOriginalName();
                 $path = 'users/' . $filename;
                 $counter = 1;
-    
+
                 while (Storage::disk('public')->exists($path)) {
                     $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
                         . '_' . $counter . '.'
                         . $file->getClientOriginalExtension();
-    
+
                     $path = 'users/' . $filename;
                     $counter++;
                 }
-    
+
                 $file->storeAs('users', $filename, 'public');
                 $imagePaths[] = $path;
             }
         }
-    
+
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -106,14 +100,13 @@ class UserController extends Controller
             'role' => $request->role ?? 'user',
             'images' => json_encode($imagePaths),
         ]);
-    
+
         return response()->json([
             'success' => true,
             'redirect' => route('dashboard'),
             'message' => 'User Created Successfully'
         ]);
     }
-    
 
     public function edit($id)
     {
@@ -124,7 +117,7 @@ class UserController extends Controller
     public function update(Request $req, $id)
     {
         $user = User::findOrFail($id);
-    
+
         $req->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -135,25 +128,25 @@ class UserController extends Controller
             'theme_color' => 'required|string',
             'bio' => 'required|string|max:1000',
         ]);
-    
+
         $existingImages = is_array($user->images)
             ? $user->images
             : json_decode($user->images, true) ?? [];
-    
+
         if ($req->delete_images) {
             foreach ($req->delete_images as $img) {
                 Storage::disk('public')->delete($img);
                 $existingImages = array_diff($existingImages, [$img]);
             }
         }
-    
+
         if ($req->hasFile('images')) {
             foreach ($req->file('images') as $file) {
-                $path = $file->store('users','public');
+                $path = $file->store('users', 'public');
                 $existingImages[] = $path;
             }
         }
-    
+
         $user->update([
             'name' => $req->name,
             'email' => $req->email,
@@ -165,53 +158,49 @@ class UserController extends Controller
             'bio' => $req->bio,
             'images' => array_values($existingImages),
         ]);
-    
+
         return response()->json([
             'success' => true,
             'redirect' => route('dashboard'),
             'message' => 'User Updated Successfully'
         ]);
     }
-    
 
     public function destroy($id)
     {
         $user = User::find($id);
-    
+
         if (!$user) {
             return response()->json([
                 'success' => false,
                 'message' => 'User already deleted'
             ]);
         }
-    
+
         // Make sure images are array
         $images = is_array($user->images)
             ? $user->images
             : (json_decode($user->images, true) ?? []);
-    
+
         foreach ($images as $img) {
             if ($img && Storage::disk('public')->exists($img)) {
                 Storage::disk('public')->delete($img);
             }
         }
-    
+
         $user->forceDelete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'User deleted successfully'
         ]);
     }
+
+    // ---  exports file --- //
     
-
-
-    // ---  exports file --- // 
-
-
     public function exportCsv()
     {
-        $users = User::where('role','!=','admin')->get();
+        $users = User::where('role', '!=', 'admin')->get();
 
         $filename = 'userRecords.csv';
 
@@ -234,33 +223,31 @@ class UserController extends Controller
                     $user->name,
                     $user->email,
                     is_array($user->department) ? implode(', ', $user->department) : $user->department,
-                    $user->experience,  
+                    $user->experience,
                     $user->skill_level,
                     $user->shift,
                     $user->dob,
-                    $user->role 
+                    $user->role
                 ]);
             }
-  
+
             fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);
-    }   
-
+    }
 
     public function exportPdf()
     {
-        $users = User::where('role','!=','admin')->get();
+        $users = User::where('role', '!=', 'admin')->get();
 
-        $pdf = Pdf::loadView('users.pdf', compact('users'))->setPaper('a4', 'landscape'); 
+        $pdf = Pdf::loadView('users.pdf', compact('users'))->setPaper('a4', 'landscape');
 
         return $pdf->download('users.pdf');
-        
     }
 
-    public function exportExcel(){
-
+    public function exportExcel()
+    {
         return Excel::download(new UsersExport, 'users.xlsx');
     }
 }

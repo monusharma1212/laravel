@@ -1,4 +1,3 @@
-<h2 style="text-align:center; margin-bottom:15px;">USER LIST</h2>
 
 <style>
 table {
@@ -40,6 +39,7 @@ th {
 }
 </style>
 
+<h2 style="text-align:center; margin-bottom:15px;">USER LIST</h2>
 <table>
     <thead>
         <tr>
